@@ -6,12 +6,12 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras import layers
 
+# For weight files 1-4
 SAVE_FILE = "saved_weights/trial_weights_4.h5"
 
 exploration_rate = 0.0296
 exploration_min = 0.01
 exploration_decay = 0.995
-gamma = 0.95
 learning_rate = 0.001
 
 batch_size = 32

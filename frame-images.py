@@ -47,7 +47,11 @@ model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate), l
 
 if os.path.isfile(SAVE_FILE):
     model.load_weights(SAVE_FILE)
-    # exploration_rate = exploration_min
+
+# Clear images
+if not os.path.exists('images'):
+    os.rmdir('images')
+os.makedirs('images')
 
 # Play episodes
 for episode in range(episodes):
