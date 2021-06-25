@@ -1,5 +1,4 @@
 import os
-from collections import deque
 import random
 from ale_py import ALEInterface
 import numpy as np
@@ -22,11 +21,13 @@ ale.loadROM("frogger.bin")
 # Get the list of legal actions
 legal_actions = ale.getMinimalActionSet()
 
+# Extra parameters
 lives_count = ale.lives()
 forward_count = 0
 is_past_road = True
 extra_action_rewards = {0: -0.5, 1: 0.0, 2: 0.0, 3: 0.0, 4: -1.0}
 
+# Get size of screen
 sample_screen = ale.getScreen().reshape([210, 160])
 sample_screen = sample_screen[::4, ::4]
 input_dim = np.size(sample_screen)
@@ -60,18 +61,20 @@ for weight_file in save_files[:4]:
             actual_reward += reward
         print(f"  Episode {episode} ended with score: {actual_reward}")
         avg_reward += (actual_reward / episodes)
+        # Reset game
         ale.reset_game()
+    # Average reward across all games
     print(f"{weight_file} average: {avg_reward}")
 
-
+# Get new size of screen
 sample_screen = ale.getScreen().reshape([210, 160])
 sample_screen = sample_screen[92:188, 8:152]
 sample_screen = sample_screen[::2, ::2]
 input_dim = np.size(sample_screen)
 
-# Model 2
+# Second model
 model2 = tf.keras.Sequential()
-model2.add(layers.Dense(256, input_dim=input_dim))
+model2.add(layers.Dense(128, input_dim=input_dim))
 model2.add(layers.Dense(64, activation='relu'))
 model2.add(layers.Dense(len(legal_actions), activation='linear'))
 
@@ -87,7 +90,8 @@ for weight_file in save_files[4:]:
         while not ale.game_over():
             # Action
             state = ale.getScreen().reshape([210, 160])
-            state = state[::4, ::4]
+            state = state[92:188, 8:152]
+            state = state[::2, ::2]
             state = state.reshape([1, input_dim])
             if random.random() <= exploration_rate:
                 action = random.randrange(len(legal_actions))
@@ -98,5 +102,7 @@ for weight_file in save_files[4:]:
             actual_reward += reward
         print(f"  Episode {episode} ended with score: {actual_reward}")
         avg_reward += (actual_reward / episodes)
+        # Reset game
         ale.reset_game()
+    # Average reward across all games
     print(f"{weight_file} average: {avg_reward}")
